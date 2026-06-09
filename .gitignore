@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+models/
+outputs/*.png
+outputs/*.csv
+data/
+.streamlit/secrets.toml
+.DS_Store
+*.log
+
+# Remove segwise.py from the repo since it no longer exists
+# The notebook is the pipeline now
