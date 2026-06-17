@@ -1,1 +1,1 @@
-SegWise - Ecommerce Customer Segmentation Using Unsupervised Machine Learning Algorithms
+SegWise - Ecommerce Customer Segmentation Using Unsupervised Machine Learning Algorithms and visualisation
