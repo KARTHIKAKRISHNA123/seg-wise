@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 
 st.set_page_config(
     page_title="SegWise — Customer Intelligence",
-    page_icon="📊",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -54,7 +54,7 @@ st.markdown("""
 .persona-card h3  { margin: 0 0 .3rem; font-size: 1.05rem; color: #fff; }
 .persona-card .kpi-row { display:flex; gap:1rem; flex-wrap:wrap; margin-top:.6rem; }
 .persona-card .kpi { background:rgba(0,0,0,.25); border-radius:8px;
-                      padding:.35rem .7rem; font-size:.8rem; color:#c8d8e8; }
+                     padding:.35rem .7rem; font-size:.8rem; color:#c8d8e8; }
 .persona-card .kpi b { display:block; font-size:1.05rem; color:#fff; }
 .persona-card .tip {
     margin-top:.8rem; padding:.5rem .8rem;
@@ -146,10 +146,10 @@ PERSONA_BADGE = {
     "Dormant Users": "badge-dormant",
 }
 PERSONA_EMOJI = {
-    "VIP Shoppers":  "👑",
-    "Deal Hunters":  "🎯",
-    "Casual Buyers": "🛍️",
-    "Dormant Users": "😴",
+    "VIP Shoppers":  "",
+    "Deal Hunters":  "",
+    "Casual Buyers": "",
+    "Dormant Users": "",
 }
 TIPS = {
     "VIP Shoppers":  "Premium loyalty rewards · early product access · concierge offers",
@@ -278,7 +278,7 @@ def progress_bar(value, max_val, color="#4adc8c", label="", val_label=""):
 # SIDEBAR
 # ------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("### 📊 SegWise")
+    st.markdown("### SegWise")
     st.markdown("Customer Intelligence")
     st.markdown("---")
     page = st.radio("", ["Dashboard","Segments","Predict","Data"], label_visibility="collapsed")
@@ -293,7 +293,8 @@ with st.sidebar:
         cnt = (df_display["Persona"] == p).sum()
         pct = cnt / len(df_display) * 100
         emoji = PERSONA_EMOJI.get(p, "")
-        st.caption(f"{emoji} {p}: {cnt:,} ({pct:.0f}%)")
+        prefix = f"{emoji} " if emoji else ""
+        st.caption(f"{prefix}{p}: {cnt:,} ({pct:.0f}%)")
 
 # ------------------------------------------------------------------
 # PAGE 1 — DASHBOARD
@@ -302,7 +303,7 @@ if page == "Dashboard":
 
     st.markdown("""
     <div class="hero">
-      <h1>📊 SegWise — Customer Intelligence</h1>
+      <h1>SegWise — Customer Intelligence</h1>
       <p>Unsupervised ML-powered segmentation for SmartCart · PCA + K-Means / Agglomerative</p>
     </div>""", unsafe_allow_html=True)
 
@@ -344,6 +345,7 @@ if page == "Dashboard":
         row = summary[summary["Persona"] == persona].iloc[0]
         css  = PERSONA_CSS.get(persona, "casual")
         emoji = PERSONA_EMOJI.get(persona, "")
+        prefix = f"{emoji} " if emoji else ""
         pct  = row["Count"] / len(df_display) * 100
 
         income_bar   = progress_bar(row["Avg_Income"],   max_income,   "#4adc8c", "Avg Income",   fmt_usd(row["Avg_Income"]))
@@ -352,7 +354,7 @@ if page == "Dashboard":
         with cols[i]:
             st.markdown(f"""
             <div class="persona-card {css}">
-              <h3>{emoji} {persona}</h3>
+              <h3>{prefix}{persona}</h3>
               <div class="kpi-row">
                 <div class="kpi"><b>{row['Count']:,.0f}</b>Customers</div>
                 <div class="kpi"><b>{pct:.0f}%</b>Share</div>
@@ -360,7 +362,7 @@ if page == "Dashboard":
               </div>
               {income_bar}
               {spending_bar}
-              <div class="tip">💡 {TIPS.get(persona,'')}</div>
+              <div class="tip">{TIPS.get(persona,'')}</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -373,10 +375,11 @@ if page == "Dashboard":
         p = row["Persona"]
         badge_cls = PERSONA_BADGE.get(p, "badge-casual")
         emoji = PERSONA_EMOJI.get(p, "")
+        prefix = f"{emoji} " if emoji else ""
         recency = row.get("Avg_Recency", 0)
         rows_html += f"""
         <tr>
-          <td><span class="badge {badge_cls}">{emoji} {p}</span></td>
+          <td><span class="badge {badge_cls}">{prefix}{p}</span></td>
           <td>{row['Count']:,.0f}</td>
           <td>{row['Count']/len(df_display)*100:.1f}%</td>
           <td>{fmt_usd(row['Avg_Income'])}</td>
@@ -409,12 +412,13 @@ elif page == "Segments":
     count = len(df_seg)
     pct   = count / len(df_display) * 100
     emoji = PERSONA_EMOJI.get(selected_persona, "")
+    prefix = f"{emoji} " if emoji else ""
     css   = PERSONA_CSS.get(selected_persona, "casual")
 
     # Hero for selected segment
     st.markdown(f"""
     <div class="persona-card {css}" style="margin-bottom:1.2rem;">
-      <h3 style="font-size:1.3rem;">{emoji} {selected_persona}</h3>
+      <h3 style="font-size:1.3rem;">{prefix}{selected_persona}</h3>
       <div class="kpi-row">
         <div class="kpi"><b>{count:,}</b>Customers</div>
         <div class="kpi"><b>{pct:.1f}%</b>of Total</div>
@@ -423,7 +427,7 @@ elif page == "Segments":
         <div class="kpi"><b>{df_seg['Age'].mean():.0f} yrs</b>Avg Age</div>
         <div class="kpi"><b>{df_seg['Recency'].mean():.0f} days</b>Avg Recency</div>
       </div>
-      <div class="tip">💡 {TIPS.get(selected_persona,'')}</div>
+      <div class="tip">{TIPS.get(selected_persona,'')}</div>
     </div>""", unsafe_allow_html=True)
 
     # Stats table
@@ -456,7 +460,7 @@ elif page == "Segments":
 
     st.markdown("---")
     st.download_button(
-        label=f"⬇️ Download {selected_persona} data as CSV",
+        label=f"Download {selected_persona} data as CSV",
         data=df_seg.to_csv(index=False),
         file_name=f"segwise_{selected_persona.replace(' ','_')}.csv",
         mime="text/csv"
@@ -498,7 +502,7 @@ elif page == "Predict":
             num_web_visits = st.slider("Web Visits / month",        0, 20, 5)
 
         complain  = st.checkbox("Complained in last 2 years", value=False)
-        submitted = st.form_submit_button("🔍 Predict Segment", use_container_width=True)
+        submitted = st.form_submit_button("Predict Segment", use_container_width=True)
 
     if submitted:
         new_dict = {
@@ -528,6 +532,7 @@ elif page == "Predict":
             persona  = effective_pm.get(cid, f"Segment {cid}")
             css      = PERSONA_CSS.get(persona, "casual")
             emoji    = PERSONA_EMOJI.get(persona, "")
+            prefix   = f"{emoji} " if emoji else ""
             tip      = TIPS.get(persona, "Personalised engagement")
 
             # Find similar customers in the same segment
@@ -539,7 +544,7 @@ elif page == "Predict":
 
             st.markdown(f"""
             <div class="result-box persona-card {css}">
-              <h2>{emoji} {persona}</h2>
+              <h2>{prefix}{persona}</h2>
               <p>This customer belongs to the <strong>{persona}</strong> segment</p>
             </div>""", unsafe_allow_html=True)
 
@@ -552,7 +557,7 @@ elif page == "Predict":
 
             st.markdown(f"""
             <div class="info-row">
-              <span class="info-chip">💡 Strategy</span>
+              <span class="info-chip">Strategy</span>
               <span class="info-chip" style="color:#c8d8e8;">{tip}</span>
             </div>""", unsafe_allow_html=True)
 
