@@ -251,6 +251,12 @@ bundle  = load_model()
 df_raw  = load_data()
 df_pred = load_predictions()
 
+# Defensive cleanup for Plotly visualisations
+df_pred = df_pred.reset_index(drop=True)
+for col in ["Income", "Total_Spending", "Age", "Recency"]:
+    if col in df_pred.columns:
+        df_pred[col] = pd.to_numeric(df_pred[col], errors="coerce")
+
 # ── Unpack bundle ─────────────────────────────────────────────
 # Extract individual objects from the dict for cleaner code below
 # These are the EXACT fitted objects from training — not new ones
@@ -409,6 +415,10 @@ if page == "Dashboard":
         # Guard: only render if the Persona column was created by the notebook
         # If someone runs app.py before the notebook, df_pred might be empty
 
+        y_col = "Total_Spending" if "Total_Spending" in df_pred.columns else "Recency"
+        if y_col == "Recency":
+            st.warning("⚠️ Total_Spending column not found — using Recency as fallback. Re-run the notebook.")
+
         fig_3d = px.scatter_3d(
             df_pred,
             # DataFrame to plot — one row = one point in 3D space
@@ -417,7 +427,7 @@ if page == "Dashboard":
             # x-axis: Annual household income
             # Higher income customers appear to the right
 
-            y="Total_Spending" if "Total_Spending" in df_pred.columns else "Recency",
+            y=y_col,
             # y-axis: Total spending across all product categories
             # Fallback to Recency if Total_Spending column missing
 
